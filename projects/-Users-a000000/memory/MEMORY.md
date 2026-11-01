@@ -1,0 +1,2 @@
+- [User profile](user-profile.md) — bio background, weak in stats; one-line-first messages
+- [Workflow setup](workflow-setup.md) — multi-model spec-driven skills, DeepSeek IDs, remote access

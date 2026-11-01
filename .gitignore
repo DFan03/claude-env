@@ -1,0 +1,24 @@
+# Whitelist: ignore everything, then allow only the portable setup.
+/*
+!/.gitignore
+!/README.md
+!/bootstrap.sh
+!/CLAUDE.md
+!/settings.json
+!/agents/
+!/skills/
+/skills/synced/
+!/tools/
+!/hooks/
+/hooks/state/
+!/standards/
+!/plugins/
+/plugins/*
+!/plugins/known_marketplaces.json
+!/projects/
+/projects/*/*
+!/projects/*/memory/
+# never
+secrets/
+*.env
+__pycache__/

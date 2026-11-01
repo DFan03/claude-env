@@ -1,0 +1,2 @@
+- [Off-the-shelf tools + rationale log](feedback_offtheshelf_and_rationale.md) — prefer established methods, log each choice, human README
+- [rna_motif project state](project_rna_motif.md) — repo, env, data, split, open decisions
