@@ -95,6 +95,11 @@ Tool: `python3 ~/.claude/tools/deepseek_delegate.py "<task>" [-c context_file ..
   user's API credit, budget-guarded); use Agent-tool subagents only when the worker needs tools/repo access. DeepSeek flash (`--standard`) = routine code/tests; DeepSeek pro (`--model pro`,
   1M ctx) = paper reading via `paper-digest`, always verify its quoted numbers against the source.
 - All code follows `code-standard`.
+- Context hygiene (hook `context_guard.py`): each project keeps `.claude/STATE.md` (<=60 lines: goal,
+  decisions + why, current wave/step, open questions, key paths, next action). Update it after every
+  decision/wave and whenever the hook warns (~120K tokens); at ~180K checkpoint + ask user to /compact.
+  STATE.md is re-injected on startup/resume/compact; trust it over summaries. Keep my own context lean:
+  delegate reading/coding, keep only conclusions + paths; don't paste big files/logs into chat.
 - Results live in the project's GitHub README.md (`living-report`): a living scientific report the user
   reads first, updated + pushed after each wave/milestone, ending as a real paper-style report. Be critical
   about which data to show and how. In chat, give the one-line result + "see README".

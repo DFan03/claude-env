@@ -12,6 +12,7 @@
 !/hooks/
 /hooks/state/
 !/standards/
+!/templates/
 !/plugins/
 /plugins/*
 !/plugins/known_marketplaces.json
