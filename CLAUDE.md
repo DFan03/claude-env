@@ -63,10 +63,12 @@ Golden standards are the accepted best-practice references for HOW to do the wor
 Tool: `python3 ~/.claude/tools/deepseek_delegate.py "<task>" [-c context_file ...]` (key lives in
 ~/.claude/secrets/deepseek.env; never print it or put it in a repo). Prints the reply plus a
 `[deepseek_usage]` token line, which the logging hook sums per task automatically.
-- DEFAULT: for ALL coding tasks (writing/editing scripts, tests, transforms, boilerplate, refactors),
-  try DeepSeek FIRST. Only fall back to doing it myself if DeepSeek fails (errors, fails review,
-  or fails after the review/fix rules below). Give it a precise, self-contained prompt with the
-  needed files via `-c`.
+- DEFAULT routing for coding (precise, self-contained prompt, needed files via `-c`):
+  - Routine code (boilerplate, transforms, plots, simple tests, refactors) -> DeepSeek flash FIRST.
+  - New/complex/task-specific logic -> Claude Sonnet via API (`claude_delegate.py --model sonnet --standard`).
+  - Review of DeepSeek output -> Sonnet via API (`--effort medium`), plus I run it/tests.
+  - Method/stats second opinion before the user decides -> Opus via API (`--model opus --effort high`).
+  - I write code myself only if the delegate fails review or the task is trivial (< ~20 lines).
 - Still handle directly (not coding): scientific/statistical reasoning, architecture decisions,
   ambiguous requirements. I may design/spec first, then delegate the code itself to DeepSeek.
 - Always review DeepSeek's output myself before accepting it: run it if it's code, check it against
