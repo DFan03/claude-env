@@ -17,3 +17,17 @@ Rules (always):
 4. **Summarize** via `paper-digest` (DeepSeek pro reads; I verify numbers/quotes against the source). Fill Summary, Key findings, What we use from it. Set status `summarized`; `verified` only after quotes/numbers are checked in the source. Show user new summaries for approval.
 5. When a decision uses a paper, set `used_in` and name the paper in methods.md.
 6. Before writing a paper or reporting: `kb.py check` must pass; flag any `to-read` paper cited.
+
+## Papers the user names (title / DOI / URL) = MUST include
+- Always add them to the KB with tag `user-provided`, even if they seem marginal; never drop them.
+- Title only -> resolve DOI via PubMed / Crossref / OpenAlex; confirm match (title + first author + year).
+- Full-text retrieval chain (legal sources only; never Sci-Hub or other piracy sites):
+  1. `python3 ~/.claude/skills/lit-kb/fetch_oa.py <DOI|URL> --key <citekey>` -> tries OpenAlex OA locations
+     (publisher OA, repositories), Europe PMC / PMC PDF, then PMC full-text XML. Prefers the published
+     version; a saved preprint is flagged `PREPRINT` -> note "preprint version" in the paper note.
+  2. PubMed MCP `get_full_text_article`, bioRxiv/medRxiv MCP, Consensus (for related OA versions).
+  3. Author-hosted copies (lab page, ResearchGate/Academia author uploads, institutional repository) via WebSearch.
+  4. Nothing works -> ask the user ONE line: "Please drop the PDF of <citekey> (<title>) into
+     reference/literature/pdfs/<citekey>.pdf (library access / interlibrary loan / ask the author)."
+     Meanwhile, summarize from the abstract only and mark the note `status: to-read (abstract only)`.
+- PDFs/XML live in `reference/literature/pdfs/` and are git-ignored (copyright); notes + bib are committed.
