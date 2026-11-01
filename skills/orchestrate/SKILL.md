@@ -25,4 +25,5 @@ Procedure:
 4. Downstream tasks receive only the relevant handoff files.
 5. After each wave: run pytest, review each output, record accepted/fixed/rejected; fall back to doing it myself if a DeepSeek result fails review (no repeated re-prompts).
 6. CLAUDE.md rules still apply: dry run before big runs, ask before cost, CPU-parallel, logs + tail -f.
-7. Tell the user one line per wave: "Wave N: k/k tasks passed; next: ...".
+7. After each wave: update README.md via `living-report` (master only), commit + push.
+8. Tell the user one line per wave: "Wave N: k/k tasks passed; README updated; next: ...".

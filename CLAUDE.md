@@ -95,6 +95,9 @@ Tool: `python3 ~/.claude/tools/deepseek_delegate.py "<task>" [-c context_file ..
   user's API credit, budget-guarded); use Agent-tool subagents only when the worker needs tools/repo access. DeepSeek flash (`--standard`) = routine code/tests; DeepSeek pro (`--model pro`,
   1M ctx) = paper reading via `paper-digest`, always verify its quoted numbers against the source.
 - All code follows `code-standard`.
+- Results live in the project's GitHub README.md (`living-report`): a living scientific report the user
+  reads first, updated + pushed after each wave/milestone, ending as a real paper-style report. Be critical
+  about which data to show and how. In chat, give the one-line result + "see README".
 - Literature (`lit-kb`): BEFORE any science/method answer or decision, search the project's
   `reference/literature/` (INDEX.md, `kb.py find`) and cite citekeys; AFTER using or finding any new paper,
   add it with `kb.py add` + summary in the same task. Metadata only from PubMed/Crossref, never memory.
