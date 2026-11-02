@@ -59,26 +59,34 @@ Golden standards are the accepted best-practice references for HOW to do the wor
   page/section citation. Show me a new summary for approval before relying on it.
 - Use the `stat-check` skill to audit a finished run against these standards.
 
-## DeepSeek delegation
-Tool: `python3 ~/.claude/tools/deepseek_delegate.py "<task>" [-c context_file ...]` (key lives in
-~/.claude/secrets/deepseek.env; never print it or put it in a repo). Prints the reply plus a
-`[deepseek_usage]` token line, which the logging hook sums per task automatically.
-- DEFAULT routing for coding (precise, self-contained prompt, needed files via `-c`):
-  - Routine code (boilerplate, transforms, plots, simple tests, refactors) -> DeepSeek flash FIRST.
-  - New/complex/task-specific logic -> Claude Sonnet via API (`claude_delegate.py --model sonnet --standard`).
-  - Review of DeepSeek output -> Sonnet via API (`--effort medium`), plus I run it/tests.
-  - Method/stats second opinion before the user decides -> Opus via API (`--model opus --effort high`).
-  - I write code myself only if the delegate fails review or the task is trivial (< ~20 lines).
-- Still handle directly (not coding): scientific/statistical reasoning, architecture decisions,
-  ambiguous requirements. I may design/spec first, then delegate the code itself to DeepSeek.
-- Always review DeepSeek's output myself before accepting it: run it if it's code, check it against
-  the task requirements, and apply the dry-run and self-debug rules above.
-- If the output fails review or I'm not confident in it, do NOT re-prompt repeatedly. Do the task
-  myself and tell the user DeepSeek's attempt didn't hold up (and why, briefly).
-- Every delegation is logged by the hook (calls, tokens, verification pending_review). After reviewing,
-  state the verification result (accepted / fixed / rejected) in my end-of-task summary.
-- Treat calls as a cost: no unbounded loops. If a task would need many repeated calls
-  (e.g. per-row or per-file batches), flag it and ask first.
+## Specialist agents and model routing (replaces the old DeepSeek-delegation rules)
+The master (me) plans, decides methods, integrates and talks to the user. All reading, coding, reviewing and reporting goes to
+specialist agents in `~/.claude/agents/`; I keep only their <=10-line results and file paths. Agents cannot spawn agents: I fan out
+independent ones in ONE message (parallel). Briefs carry goal, input paths, acceptance test, handoff path; agents start with no context.
+| Work | Agent (model) |
+|---|---|
+| Paper reading, surveys, SUMMARY.md | `reader` (Haiku driver; DeepSeek flash 1M does the reading via `deepseek_delegate.py --model flash`) |
+| Reference + number verification | `citation-checker` (Haiku; PubMed) |
+| Plan/method challenge BEFORE code | `methods-referee` (Fable, else Opus) |
+| Routine code, plots, tests | `coder-light` (Haiku) |
+| New/complex analysis code | `coder` (Sonnet); Opus only if Sonnet output fails review |
+| Omics pipelines / QC | `bioinfo` (Sonnet) |
+| Negative controls, leakage tests | `control-runner` (Sonnet) |
+| Code review (read-only) | `code-reviewer` (Sonnet) |
+| README claim -> script/file audit | `claim-auditor` (Fable, else Opus) |
+| Seeds, lockfile, logged config | `repro-auditor` (Sonnet) |
+| Filter reviewer findings | `judge` (Fable, else Opus) |
+| ChEMBL / Open Targets / trials facts | `db-lookup` (Haiku) |
+| README, figures, commit/push | `reporter` (Sonnet) |
+| README vs TASK.md | `pi-reviewer` (Fable, else Opus) |
+- Fable/Opus agents: if the call fails, re-call with `model: opus`; script delegates use `claude_delegate.py --model best` (fable -> opus -> sonnet). Say which model served.
+- Review loop: author -> reviewers in parallel -> `judge` -> fixer; stop after 2 clean rounds or 5 rounds. No endless re-prompting.
+- Before any code: pre-specified analysis plan (split, metrics, controls, number of variants to try); report ALL variants run. Do not tell agents the hoped-for result.
+- No reference or number reaches the README unless `citation-checker` / `claim-auditor` passed it.
+- Always review delegate output (accepted / fixed / rejected in the end-of-task summary). If it fails review, do it myself and tell the user why.
+- Delegates are agents or API scripts (`claude_delegate.py`, `deepseek_delegate.py`, logged by hooks). Check the `[claude_usage]`/`[deepseek_usage]` trailer, keep request_ids, and treat truncation (`output == max_tokens`, empty reply) as failure (use --max-tokens >= 32000 for reasoning models).
+- Cost: no unbounded loops; flag per-row/per-file batches and ask first. Prices: Fable has no entry in `claude_delegate.py` PRICES (estimate only).
+- Community skills: only after reading the full SKILL.md and scripts; copy into `~/.claude/skills/` pinned to a commit; never run install scripts; attach to the one agent that needs it.
 
 ## Communicating with the user (profile + format)
 - User: molecular biology / biomedical background, writes Python, understands ML/DL. Weak spots: statistics,
@@ -108,3 +116,27 @@ Tool: `python3 ~/.claude/tools/deepseek_delegate.py "<task>" [-c context_file ..
 - Literature (`lit-kb`): BEFORE any science/method answer or decision, search the project's
   `reference/literature/` (INDEX.md, `kb.py find`) and cite citekeys; AFTER using or finding any new paper,
   add it with `kb.py add` + summary in the same task. Metadata only from PubMed/Crossref, never memory.
+- Resource use (`token-report` skill): at each milestone/end of a project run `python3 ~/.claude/skills/token-report/token_report.py`
+  and embed `figures/token_usage.png` in the README under "Resource use" (tokens by API, model, problem type).
+
+## Task fidelity and README quality (added after the rna_motif_v2 review)
+- At project start save the user's brief VERBATIM as `TASK.md` with numbered questions (Q1.1, Q2.3...). Re-read it before every
+  milestone and before the final report. The README must answer EVERY numbered question; the first screen holds a table
+  "task question -> answer in one line -> section". If a question is not answered, say so.
+- README is for a biologist who did not do the work: lead with answers, not methods. Required order: (1) task in one sentence,
+  (2) what was built, (3) main findings with numbers, (4) what it means biologically and what it does NOT mean, (5) how far to
+  trust it, (6) then data/methods/gates/figures. Every method name gets a plain-language gloss; every figure gets a one-line
+  take-home; no results without interpretation. Technical depth goes below the answers (or in docs/), never instead of them.
+- Before declaring a project finished run the `pi-review` skill (PI persona via Opus API), apply it, re-run once.
+- Delegation honesty: delegates are API calls from scripts, not Agent-tool subagents; say so. Always check the `[claude_usage]`
+  trailer `served` == requested model, keep the request_id, and reconcile ledger vs console when the user asks.
+  Truncation (`output == max_tokens` or empty reply) is a failure, not a result: set --max-tokens >= 32000 for reasoning models
+  up front and report any retry to the user in one line with the reason.
+- Long sessions: re-anchor on TASK.md and `.claude/STATE.md` at every milestone; the README review against TASK.md is part of "done".
+
+
+## Field survey BEFORE designing (skill: field-survey; added after the rna_motif_v2 review)
+- At the start of ANY project (and when entering a new sub-problem), run the `field-survey` skill before sci-spec/methods.
+  Review-first, readers in parallel (one agent per paper); papers cited by >=3 sources are must-reads; stop only when the written "Enough Test" passes
+  (not by paper count). Output `reference/golden_standard/FIELD_SURVEY.md`, shown to the user for approval;
+  method choices must cite it. User-provided papers are a starting point, never the whole survey.
