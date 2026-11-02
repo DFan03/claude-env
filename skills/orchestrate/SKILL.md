@@ -16,7 +16,7 @@ API workers (`~/.claude/tools/claude_delegate.py`) spend the user's API credit (
 (give all needed files via -c). Run several in parallel as background shell jobs. Check `--spent` each wave;
 warn the user at 75% of budget.
 | Routine code, tests, plots | DeepSeek flash | `deepseek_delegate.py --standard` |
-| Paper reading | DeepSeek V4 pro | `paper-digest` skill |
+| Paper reading | DeepSeek flash 1M | `paper-digest` skill |
 
 Procedure:
 1. Read tasks.md; group tasks into waves by dependency.

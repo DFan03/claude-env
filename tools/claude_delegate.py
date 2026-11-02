@@ -26,7 +26,8 @@ HOME = Path.home() / ".claude"
 ENV_FILE = HOME / "secrets" / "anthropic.env"
 LEDGER = HOME / "state" / "claude_api_ledger.jsonl"
 PREAMBLE = HOME / "skills" / "code-standard" / "PREAMBLE.md"
-MODELS = {"opus": "claude-opus-5-5", "sonnet": "claude-sonnet-5-5", "haiku": "claude-haiku-5-5"}
+MODELS = {"fable": "claude-fable-5-1", "opus": "claude-opus-5-5", "sonnet": "claude-sonnet-5-5", "haiku": "claude-haiku-5-5"}
+BEST_CHAIN = ["claude-fable-5-1", "claude-opus-5-5", "claude-sonnet-5-5"]  # --model best: first one the key can call
 # USD per 1M tokens: (input, output, cache_read). Source: claude-api skill table, cached 2026-10-06.
 PRICES = {"claude-opus-5-5": (4.0, 20.0, 0.20), "claude-sonnet-5-5": (2.0, 10.0, 0.20),
           "claude-haiku-5-5": (0.10, 0.50, 0.01)}
@@ -66,6 +67,8 @@ def record(entry: dict) -> float:
 
 
 def cost(model: str, u) -> float:
+    if model not in PRICES:
+        print(f"[warning: no price for {model}; using default estimate]", file=sys.stderr)
     pin, pout, pcache = PRICES.get(model, (4.0, 20.0, 0.20))
     cache_read = getattr(u, "cache_read_input_tokens", 0) or 0
     return (u.input_tokens * pin + u.output_tokens * pout + cache_read * pcache) / 1e6
@@ -94,7 +97,7 @@ def main() -> None:
     if total >= budget:
         sys.exit(f"error: API budget reached (${total:.2f} >= ${budget:.2f}); ask the user")
 
-    model = MODELS.get(a.model, a.model)
+    chain = BEST_CHAIN if a.model == "best" else [MODELS.get(a.model, a.model)]
     system = (PREAMBLE.read_text() + "\n\n" + a.system) if a.standard else a.system
     parts = [(sys.stdin.read() if a.task == "-" else a.task).strip()]
     for f in a.context_file:
@@ -102,23 +105,28 @@ def main() -> None:
 
     client = anthropic.Anthropic(api_key=env["ANTHROPIC_API_KEY"], max_retries=3)
     t0 = time.time()
-    try:
-        with client.messages.stream(
-            model=model, max_tokens=a.max_tokens, system=system,
-            output_config={"effort": a.effort},
-            messages=[{"role": "user", "content": "\n".join(parts)}],
-        ) as stream:
-            msg = stream.get_final_message()
-    except anthropic.AuthenticationError:
-        sys.exit("error: invalid Anthropic API key")
-    except anthropic.NotFoundError as e:
-        sys.exit(f"error: model/endpoint not found: {e.message}")
-    except anthropic.RateLimitError:
-        sys.exit("error: rate limited; retry later")
-    except anthropic.APIStatusError as e:
-        sys.exit(f"error: API {e.status_code}: {e.message}")
-    except anthropic.APIConnectionError:
-        sys.exit("error: network error")
+    for i, model in enumerate(chain):
+        try:
+            with client.messages.stream(
+                model=model, max_tokens=a.max_tokens, system=system,
+                output_config={"effort": a.effort},
+                messages=[{"role": "user", "content": "\n".join(parts)}],
+            ) as stream:
+                msg = stream.get_final_message()
+            break
+        except (anthropic.NotFoundError, anthropic.PermissionDeniedError) as e:
+            if i + 1 < len(chain):
+                print(f"[fallback: {model} unavailable ({getattr(e, 'message', e)}); trying {chain[i + 1]}]", file=sys.stderr)
+                continue
+            sys.exit(f"error: model/endpoint not found: {getattr(e, 'message', e)}")
+        except anthropic.AuthenticationError:
+            sys.exit("error: invalid Anthropic API key")
+        except anthropic.RateLimitError:
+            sys.exit("error: rate limited; retry later")
+        except anthropic.APIStatusError as e:
+            sys.exit(f"error: API {e.status_code}: {e.message}")
+        except anthropic.APIConnectionError:
+            sys.exit("error: network error")
 
     if msg.stop_reason == "refusal":
         print("[refused by safety classifier: escalate to master agent]")
@@ -128,8 +136,11 @@ def main() -> None:
     usd = cost(model, msg.usage)
     total = record({"ts": time.strftime("%Y-%m-%dT%H:%M:%S"), "model": model, "effort": a.effort,
                     "input": msg.usage.input_tokens, "output": msg.usage.output_tokens,
-                    "usd": round(usd, 5), "secs": round(time.time() - t0, 1), "cwd": str(Path.cwd())})
-    print("[claude_usage] " + json.dumps({"model": model, "input": msg.usage.input_tokens,
+                    "usd": round(usd, 5), "secs": round(time.time() - t0, 1), "cwd": str(Path.cwd()),
+                    "request_id": msg.id, "model_returned": msg.model})
+    if msg.model != model:
+        print(f"[warning: requested {model} but API served {msg.model}]")
+    print("[claude_usage] " + json.dumps({"model": model, "served": msg.model, "request_id": msg.id, "input": msg.usage.input_tokens,
           "output": msg.usage.output_tokens, "usd": round(usd, 4),
           "spent_total": round(total, 2), "budget": budget}))
 
