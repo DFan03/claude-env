@@ -1,6 +1,6 @@
 ---
 name: coder-light
-description: Routine, well-specified code: transforms, plots, simple tests, refactors, format conversion. Not for novel logic.
+description: "Routine, well-specified code: transforms, plots, simple tests, refactors, format conversion. Not for novel logic."
 model: haiku
 tools: Read, Write, Edit, Bash, Grep, Glob
 skills: code-standard, dataviz

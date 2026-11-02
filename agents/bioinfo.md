@@ -1,6 +1,6 @@
 ---
 name: bioinfo
-description: Omics pipelines and QC: nf-core runs, RNA-seq, single-cell QC, scVI integration. Use for sequencing-data processing.
+description: "Omics pipelines and QC: nf-core runs, RNA-seq, single-cell QC, scVI integration. Use for sequencing-data processing."
 model: sonnet
 tools: Read, Write, Edit, Bash, Grep, Glob
 skills: code-standard, bio-research:nextflow-development, bio-research:single-cell-rna-qc, bio-research:scvi-tools

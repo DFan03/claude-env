@@ -1,6 +1,6 @@
 ---
 name: judge
-description: Filters findings from several reviewers: removes hallucinated or unsupported ones and ranks the rest. Use after parallel reviews. If unavailable the master re-calls with opus.
+description: "Filters findings from several reviewers: removes hallucinated or unsupported ones and ranks the rest. Use after parallel reviews. If unavailable the master re-calls with opus."
 model: fable
 tools: Read, Grep, Glob
 ---

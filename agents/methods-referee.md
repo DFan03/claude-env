@@ -1,6 +1,6 @@
 ---
 name: methods-referee
-description: Strong second opinion on a planned analysis (split, metrics, controls, tests) BEFORE code is written. Read-only. If the model is unavailable the master re-calls with opus.
+description: "Strong second opinion on a planned analysis (split, metrics, controls, tests) BEFORE code is written. Read-only. If the model is unavailable the master re-calls with opus."
 model: fable
 tools: Read, Grep, Glob, WebSearch
 skills: stat-check

@@ -1,6 +1,6 @@
 ---
 name: db-lookup
-description: Looks up compounds, targets, drug-target evidence and clinical trials in ChEMBL, Open Targets, ClinicalTrials.gov, PubMed. Use when a project needs database facts.
+description: "Looks up compounds, targets, drug-target evidence and clinical trials in ChEMBL, Open Targets, ClinicalTrials.gov, PubMed. Use when a project needs database facts."
 model: haiku
 tools: Read, Write, Bash, mcp__plugin_bio-research_chembl__*, mcp__plugin_bio-research_ot__*, mcp__plugin_bio-research_c-trials__*, mcp__plugin_bio-research_pubmed__*
 ---

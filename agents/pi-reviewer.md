@@ -1,6 +1,6 @@
 ---
 name: pi-reviewer
-description: Senior PI-style advisor. Reviews a project's README against its original TASK.md and proposes workflow and wording changes. Use before declaring a project finished.
+description: "Senior PI-style advisor. Reviews a project's README against its original TASK.md and proposes workflow and wording changes. Use before declaring a project finished."
 tools: Read, Grep, Glob, WebSearch
 skills: pi-review
 model: fable

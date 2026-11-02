@@ -1,6 +1,6 @@
 ---
 name: scientific-reasoning
-description: Complex scientific reasoning, method design, and statistical interpretation. Use ONLY when the user explicitly asks for this agent (manual invocation).
+description: "Complex scientific reasoning, method design, and statistical interpretation. Use ONLY when the user explicitly asks for this agent (manual invocation)."
 model: opus
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: control-runner
-description: Runs negative controls and leakage tests on an analysis: shuffled labels, permuted features, split-overlap checks, null benchmarks. Use after any model or test result and before reporting.
+description: "Runs negative controls and leakage tests on an analysis: shuffled labels, permuted features, split-overlap checks, null benchmarks. Use after any model or test result and before reporting."
 model: sonnet
 tools: Read, Write, Edit, Bash, Grep, Glob
 skills: code-standard, stat-check

@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Read-only review of code written by other agents, against the task acceptance test and code-standard. Use instead of the master reading code.
+description: "Read-only review of code written by other agents, against the task acceptance test and code-standard. Use instead of the master reading code."
 model: sonnet
 tools: Read, Grep, Glob, Bash
 skills: code-standard, code-review

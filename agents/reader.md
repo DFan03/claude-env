@@ -1,6 +1,6 @@
 ---
 name: reader
-description: Reads papers and long documents and returns page-cited digests. Use for any literature reading, field surveys, or building SUMMARY.md files, so the master never reads papers.
+description: "Reads papers and long documents and returns page-cited digests. Use for any literature reading, field surveys, or building SUMMARY.md files, so the master never reads papers."
 model: haiku
 tools: Read, Write, Grep, Glob, Bash, mcp__plugin_bio-research_pubmed__*, mcp__plugin_bio-research_biorxiv__*, mcp__plugin_bio-research_consensus__*
 skills: paper-digest, field-survey, lit-kb

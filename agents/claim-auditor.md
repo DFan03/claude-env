@@ -1,6 +1,6 @@
 ---
 name: claim-auditor
-description: Maps every quantitative claim in the README or report to the script and output file that produced it, and audits code and logs (split, metric choice, which variants were reported). If unavailable the master re-calls with opus.
+description: "Maps every quantitative claim in the README or report to the script and output file that produced it, and audits code and logs (split, metric choice, which variants were reported). If unavailable the master re-calls with opus."
 model: fable
 tools: Read, Grep, Glob, Bash
 skills: stat-check

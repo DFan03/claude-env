@@ -1,6 +1,6 @@
 ---
 name: reporter
-description: Updates the project README as a living report, builds figures, commits and pushes. Use after each wave or milestone.
+description: "Updates the project README as a living report, builds figures, commits and pushes. Use after each wave or milestone."
 model: sonnet
 tools: Read, Write, Edit, Bash, Grep, Glob
 skills: living-report, token-report, dataviz

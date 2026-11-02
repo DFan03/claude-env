@@ -1,6 +1,6 @@
 ---
 name: citation-checker
-description: Verifies every reference and every quantitative claim in a README or report. Use before living-report publishes and before any project is declared finished.
+description: "Verifies every reference and every quantitative claim in a README or report. Use before living-report publishes and before any project is declared finished."
 model: haiku
 tools: Read, Write, Grep, Glob, Bash, mcp__plugin_bio-research_pubmed__*
 skills: lit-kb

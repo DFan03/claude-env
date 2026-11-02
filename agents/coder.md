@@ -1,6 +1,6 @@
 ---
 name: coder
-description: New or complex analysis code with task-specific logic. Escalate to opus only if its output fails review.
+description: "New or complex analysis code with task-specific logic. Escalate to opus only if its output fails review."
 model: sonnet
 tools: Read, Write, Edit, Bash, Grep, Glob
 skills: code-standard, simplify

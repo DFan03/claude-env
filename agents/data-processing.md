@@ -1,6 +1,6 @@
 ---
 name: data-processing
-description: Simple data transforms, cleaning, reformatting, and routine scripting that need project context. Use ONLY when the user explicitly asks for this agent (manual invocation).
+description: "Simple data transforms, cleaning, reformatting, and routine scripting that need project context. Use ONLY when the user explicitly asks for this agent (manual invocation)."
 model: haiku
 ---
 

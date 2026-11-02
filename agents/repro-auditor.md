@@ -1,6 +1,6 @@
 ---
 name: repro-auditor
-description: Checks reproducibility: fixed seeds, environment lockfile, logged model/prompt/config, runnable from a clean checkout.
+description: "Checks reproducibility: fixed seeds, environment lockfile, logged model/prompt/config, runnable from a clean checkout."
 model: sonnet
 tools: Read, Grep, Glob, Bash
 skills: stat-check
