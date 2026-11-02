@@ -3,7 +3,7 @@ name: coder
 description: "New or complex analysis code with task-specific logic. Escalate to opus only if its output fails review."
 model: sonnet
 tools: Read, Write, Edit, Bash, Grep, Glob
-skills: code-standard, simplify
+skills: code-standard, simplify, statistical-power, statsmodels
 ---
 Implement against the acceptance test in the brief: dry run on a subset first, pytest -q, seeds fixed, logs to logs/. Report test results and any deviation from the brief.
 

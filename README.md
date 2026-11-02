@@ -63,16 +63,16 @@ it receives a result of at most 10 lines plus file paths from each agent. Agents
 |---|---|---|---|
 | `reader` | Haiku driver + DeepSeek flash 1M | paper-digest, field-survey, lit-kb | Reads papers/long docs; page-cited digests; quotes verified by grep |
 | `citation-checker` | Haiku | lit-kb | Resolves every reference on PubMed/Crossref; traces every README number |
-| `methods-referee` | Fable, else Opus | stat-check | Challenges split, metrics, controls, tests before code (read-only) |
-| `coder-light` | Haiku | code-standard, dataviz | Routine code, plots, simple tests |
-| `coder` | Sonnet | code-standard, simplify | New/complex analysis code (Opus only if it fails review) |
-| `bioinfo` | Sonnet | nextflow-development, single-cell-rna-qc, scvi-tools, code-standard | Omics pipelines and QC |
+| `methods-referee` | Fable, else Opus | stat-check, statistical-analysis | Challenges split, metrics, controls, tests before code (read-only) |
+| `coder-light` | Haiku | code-standard, dataviz, scientific-visualization | Routine code, plots, simple tests |
+| `coder` | Sonnet | code-standard, simplify, statistical-power, statsmodels | New/complex analysis code (Opus only if it fails review) |
+| `bioinfo` | Sonnet | nextflow-development, single-cell-rna-qc, scvi-tools, scanpy, anndata, code-standard | Omics pipelines and QC |
 | `control-runner` | Sonnet | code-standard, stat-check | Negative controls and leakage tests |
 | `code-reviewer` | Sonnet | code-standard, code-review | Read-only code review vs acceptance test |
 | `repro-auditor` | Sonnet | stat-check | Seeds, lockfile, logged model/config, clean-checkout run |
 | `claim-auditor` | Fable, else Opus | stat-check | README claim -> script -> output file; audits split, metric, variants reported |
 | `judge` | Fable, else Opus | none | Removes hallucinated or unsupported reviewer findings |
-| `db-lookup` | Haiku | none | ChEMBL, Open Targets, ClinicalTrials.gov, PubMed facts with IDs |
+| `db-lookup` | Haiku | database-lookup | ChEMBL, Open Targets, ClinicalTrials.gov, PubMed facts with IDs |
 | `reporter` | Sonnet | living-report, token-report, dataviz | README, figures, commit and push |
 | `pi-reviewer` | Fable, else Opus | pi-review | PI-style README vs TASK.md review |
 | `scientific-reasoning`, `data-processing` | Opus / Haiku | none | Manual-only helpers (user must ask) |
@@ -89,6 +89,10 @@ All agents were smoke-tested (model, preloaded skills, tools); no real task has 
 | Build | `orchestrate`, `code-standard` | Parallel waves with file hand-offs; one coding/testing preamble |
 | Verify | `stat-check` | Audit against golden standards |
 | Report | `living-report`, `token-report`, `pi-review` | Living README, token-usage figure, PI review |
+
+Community skills (K-Dense `claude-scientific-skills`, commit `a25cf9e`, MIT): `statistical-analysis`, `statistical-power`, `statsmodels`,
+`scientific-visualization`, `database-lookup` (biology references only), `scanpy`, `anndata`. Each was read in full by an agent (no network, subprocess or
+eval in scripts); the self-citation section and `allowed-tools` were removed, and our golden standards override their default alpha/power/QC values.
 
 ### 3.3 Tools, hooks, standards
 
