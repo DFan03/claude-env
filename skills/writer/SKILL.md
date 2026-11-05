@@ -7,8 +7,9 @@ Master does NOT write prose itself. Pass facts to the writer, review its output,
 1. Assemble the brief: doc type + venue/audience, section wanted, TASK.md questions (verbatim), allowed citekeys,
    voice sample path (user's prior paper) if any, "preliminary" status.
 2. Put ALL facts in context files (results tables from result files, handoff outputs, library.bib keys). The writer has no tools and must not guess.
-3. Run: `python3 ~/.claude/tools/writer_delegate.py "<brief>" -c facts.md [-c ...] --out <draft.md>` (chain opus,sonnet).
-4. Check the `[claude_usage]` trailer (`served` = requested, else say which model served), no truncation, then review:
+3. Voice: if the user gave no sample, run the `voice-merge` skill first (Nature/Cell/Science + allowed sub-journals only) and pass `--voice reference/voice/VOICE.md`.
+4. Run: `python3 ~/.claude/tools/writer_delegate.py "<brief>" -c facts.md [-c ...] --out <draft.md>` (chain opus,sonnet).
+5. Check the `[claude_usage]` trailer (`served` = requested, else say which model served), no truncation, then review:
    every number/citation vs source files (claim-auditor / citation-checker before README), resolve `[MISSING]` items,
    report accepted/fixed/rejected to the user.
 Packed: writer/PERSONA.md, academic-humanizer (pinned, see its PINNED.txt), living-report, statistical-analysis/references/reporting_standards.md, lit-kb citation rule.

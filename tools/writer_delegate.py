@@ -2,7 +2,7 @@
 """Writer agent: Claude API call (opus, falls back to sonnet) with a packed skill system prompt.
 
 Usage:
-  writer_delegate.py "brief text" -c facts.md -c results.csv [--out draft.md] [--model opus,sonnet] [--effort high]
+  writer_delegate.py "brief text" -c facts.md -c results.csv [--voice reference/voice/VOICE.md] [--out draft.md] [--model opus,sonnet] [--effort high]
   echo "brief" | writer_delegate.py - -c ...
 Packed skills (system prompt): writer/PERSONA.md, academic-humanizer/SKILL.md, living-report/SKILL.md,
   statistical-analysis/references/reporting_standards.md (stat reporting wording), lit-kb citation rule.
@@ -31,6 +31,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("brief", help="brief text, or '-' for stdin")
     ap.add_argument("-c", "--context-file", action="append", default=[])
+    ap.add_argument("--voice", help="VOICE.md style card (skills/voice-merge); packed into the system prompt")
     ap.add_argument("--out", help="also save the writer's reply to this file")
     ap.add_argument("--model", default="opus,sonnet", help="fallback chain, default opus,sonnet")
     ap.add_argument("--effort", default="high", choices=["low", "medium", "high", "xhigh", "max"])
@@ -38,6 +39,8 @@ def main() -> None:
     a = ap.parse_args()
 
     system = "\n\n".join(f"===== {name} =====\n{p.read_text() if p else LITKB}" for name, p in PACK)
+    if a.voice:
+        system += f"\n\n===== VOICE CARD (imitate structure and register only; never copy wording) =====\n{Path(a.voice).read_text()}"
     cmd = [sys.executable, str(H / "tools/claude_delegate.py"), a.brief if a.brief != "-" else sys.stdin.read(),
            "--model", a.model, "--effort", a.effort, "--max-tokens", str(a.max_tokens), "--system", system]
     for f in a.context_file:
