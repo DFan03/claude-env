@@ -7,5 +7,5 @@ ALLOWED (sub-journals, default list; edit freely):
   Molecular Cell | Cell Systems | Cell Genomics | Developmental Cell | Cancer Cell | Immunity | Neuron | Cell Stem Cell | Cell Metabolism
   Science Translational Medicine | Science Signaling
 NOT ALLOWED (examples): Scientific Reports | Communications Biology | Nature Communications | Cell Reports | iScience | Science Advances | any Nature Reviews/News/Perspective
-# Open question for the user: Nature Communications, Cell Reports and Science Advances are in the NOT list by default; move them up to allow.
+# Confirmed by user 2026-11-05: keep this default list as is.
 # Article type: primary research articles only (no reviews, news, comments, preprints).
