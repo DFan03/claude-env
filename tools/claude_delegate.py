@@ -97,7 +97,7 @@ def main() -> None:
     if total >= budget:
         sys.exit(f"error: API budget reached (${total:.2f} >= ${budget:.2f}); ask the user")
 
-    chain = BEST_CHAIN if a.model == "best" else [MODELS.get(a.model, a.model)]
+    chain = BEST_CHAIN if a.model == "best" else [MODELS.get(m, m) for m in a.model.split(",")]  # "opus,sonnet" = fallback chain
     system = (PREAMBLE.read_text() + "\n\n" + a.system) if a.standard else a.system
     parts = [(sys.stdin.read() if a.task == "-" else a.task).strip()]
     for f in a.context_file:

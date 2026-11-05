@@ -1,0 +1,3 @@
+source: https://github.com/AIScientists-Dev/academic-humanizer
+commit: 94b88b23703bed7df507acae7d6d5876209a0cdf
+version: 0.3.3 (MIT). Read in full before install; no scripts in repo; assets (png/svg) omitted.

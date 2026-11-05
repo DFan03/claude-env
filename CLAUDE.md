@@ -140,3 +140,8 @@ independent ones in ONE message (parallel). Briefs carry goal, input paths, acce
   Review-first, readers in parallel (one agent per paper); papers cited by >=3 sources are must-reads; stop only when the written "Enough Test" passes
   (not by paper count). Output `reference/golden_standard/FIELD_SURVEY.md`, shown to the user for approval;
   method choices must cite it. User-provided papers are a starting point, never the whole survey.
+
+## Writing goes to the writer agent
+- All scientific prose (README/report sections, abstracts, methods, discussion, captions, rebuttals, grants) is written by the
+  writer agent, not by me: use the `writer` skill (`tools/writer_delegate.py`, Claude API, opus -> sonnet fallback, academic-humanizer
+  + living-report + stats-reporting packed in). I pass facts/numbers/citekeys via context files, review the output, then place it.
