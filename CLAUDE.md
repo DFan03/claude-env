@@ -20,6 +20,10 @@
 - Use as much CPU as possible: parallelize across all cores (`nproc`/`sysctl -n hw.ncpu`;
   multiprocessing, joblib, xargs -P, GNU parallel, torch/numba threads, etc.). Don't leave cores idle.
   (Cap only if memory would run out or the user says otherwise.)
+- API-bound jobs (LLM/HTTP calls, screening, retrieval): once the cost is estimated and the user has approved the run, use as MANY
+  workers as the provider tolerates, not a conservative default like 16. Start high (e.g. 64-100), watch the log for 429/5xx/timeouts
+  or falling per-record throughput, and back off only when errors appear. NOTE (2026-11-09): a run at ~160 workers produced ~40% empty replies from record ~11,000 on; the cause was the DeepSeek account running out of credit, NOT worker count (the same worker level had run clean before). Scripts record failed calls as valid_json=false without crashing, so always monitor the invalid/empty-reply rate in the output file (not just the log) and stop at the first burst of failures to check balance/auth/rate limit before blaming concurrency. Split independent parts (branches, sources) into
+  concurrent processes. A low worker cap on an approved job is wasted user time. Jobs must be resumable so a restart costs nothing.
 - Before starting, tell the user an ESTIMATED run time (from the dry run / timing a small slice
   extrapolated to full size), and say how it was estimated.
 - The user must be able to see what it is doing: run with live progress (tqdm or periodic lines with

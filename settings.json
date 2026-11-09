@@ -61,6 +61,14 @@
             "command": "python3 ~/.claude/hooks/log_event.py"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/env node /Users/a000000/.tokentracker/bin/notify.cjs --source=claude 2>/dev/null || true"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -96,8 +104,25 @@
           }
         ]
       }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/env node /Users/a000000/.tokentracker/bin/notify.cjs --source=claude"
+          }
+        ]
+      }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline.sh"
+  },
   "autoCompactWindow": 200000,
-  "theme": "dark"
+  "theme": "dark",
+  "switchModelsOnFlag": false,
+  "agentPushNotifEnabled": true,
+  "skipDangerousModePermissionPrompt": true
 }

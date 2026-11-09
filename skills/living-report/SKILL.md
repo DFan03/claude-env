@@ -31,3 +31,6 @@ The user reads results on GitHub first. README.md is the report; chat only point
 - Master agent owns README.md; workers write handoff files only, never edit README.
 - Update after each wave/milestone; commit "report: <what changed>" and push.
 - At project end: rewrite as a coherent final report (not a log); move process details to Changelog.
+
+## Resource use
+At milestones and in the final report, run the `token-report` skill and embed `figures/token_usage.png` in a "Resource use" section.
