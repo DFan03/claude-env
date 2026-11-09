@@ -1,0 +1,1 @@
+- [简历正向写作取向](feedback_resume_positive_framing.md) — 只写完成项,不主动写缺口,少专业数字

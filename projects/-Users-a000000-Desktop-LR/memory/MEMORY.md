@@ -1,0 +1,4 @@
+- [Close Chrome tabs when done](feedback_close-chrome-tabs.md) — close each claude-in-chrome tab right after use; end-of-job cleanup fails
+- [Use Claude API more](feedback_use-claude-api-more.md) — route self-contained work to API credit, right model per task; DeepSeek for reading
+- [Budget: quality over cost](feedback_budget-quality-over-cost.md) — no ceiling, user tops up; no blind spend
+- [No DeepSeek pro](feedback_no-deepseek-pro.md) — pro-type tasks go to Claude API (2026-11-09)

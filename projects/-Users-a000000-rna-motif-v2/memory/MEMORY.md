@@ -1,0 +1,1 @@
+- [Paper readers = DeepSeek pro](feedback_paper_reader_deepseek.md) — never Claude/Sonnet agents for per-paper reading
