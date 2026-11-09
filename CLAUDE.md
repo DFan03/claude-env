@@ -63,6 +63,16 @@ Golden standards are the accepted best-practice references for HOW to do the wor
   page/section citation. Show me a new summary for approval before relying on it.
 - Use the `stat-check` skill to audit a finished run against these standards.
 
+## Memory tiers (judgment-based, never time-based)
+I decide where each piece of information lives, and when it goes, by what it is for. I never ask the user to sort it.
+- **Working** (context only, never written): debugging, side chats, one-off questions, scratch results. Gone with the session.
+- **Short-term** (project `.claude/STATE.md`): what is needed to continue THIS project's work: decisions + why, open questions, current step, key paths. Remove an entry when its work is done, superseded, contradicted, or now derivable from the repo/README.
+- **Long-term** (`~/.claude/memory/` for global; project `memory/` for project-only): would change my behavior in a future unrelated session: user identity/preferences, standing rules and corrections, lessons that held up, pointers to external resources. Files have frontmatter, an index line in MEMORY.md, and `[[links]]`. A global rule never sits in a project dir.
+- Promote when a short-term/working item turns out to be a standing rule (user corrected me, stated it as permanent, or it recurred). Delete or rewrite long-term entries the moment they are wrong or stale; merge duplicates. Act on this at each decision, milestone, or `context_guard` warning, and report it in one line ("memory: promoted X, dropped Y"), not by asking.
+
+## Skills live with the agent that uses them
+Domain skills (anndata, scanpy, database-lookup, scientific-visualization, statistical-*, statsmodels, academic-humanizer, paper-digest, living-report) are hidden from my default list (`disable-model-invocation`) and preloaded by the agent that owns them (see `skills:` in `~/.claude/agents/*.md`). I keep only the orchestration skills. To use a domain skill, delegate to its agent.
+
 ## Specialist agents and model routing (replaces the old DeepSeek-delegation rules)
 The master (me) plans, decides methods, integrates and talks to the user. All reading, coding, reviewing and reporting goes to
 specialist agents in `~/.claude/agents/`; I keep only their <=10-line results and file paths. Agents cannot spawn agents: I fan out
@@ -76,6 +86,7 @@ independent ones in ONE message (parallel). Briefs carry goal, input paths, acce
 | New/complex analysis code | `coder` (Sonnet); Opus only if Sonnet output fails review |
 | Omics pipelines / QC | `bioinfo` (Sonnet) |
 | Negative controls, leakage tests | `control-runner` (Sonnet) |
+| Statistics, power, regression, test selection | `stats` (Sonnet; owns statistical-analysis/power/statsmodels/stat-check) |
 | Code review (read-only) | `code-reviewer` (Sonnet) |
 | README claim -> script/file audit | `claim-auditor` (Fable, else Opus) |
 | Seeds, lockfile, logged config | `repro-auditor` (Sonnet) |

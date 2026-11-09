@@ -1,5 +1,6 @@
 ---
 name: paper-digest
+disable-model-invocation: true
 description: Offload paper/long-document reading to DeepSeek flash (1M context) and get a structured, citation-checked summary. Use for literature review or building golden-standard SUMMARY.md files.
 ---
 # Paper digest

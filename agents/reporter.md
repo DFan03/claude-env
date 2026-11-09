@@ -3,7 +3,7 @@ name: reporter
 description: "Updates the project README as a living report, builds figures, commits and pushes. Use after each wave or milestone."
 model: sonnet
 tools: Read, Write, Edit, Bash, Grep, Glob
-skills: living-report, token-report, dataviz
+skills: living-report, token-report, dataviz, scientific-visualization
 ---
 Follow living-report and CLAUDE.md README rules (answers first, task-question table, plain language). Only report numbers that exist in results files. Run citation-checker output into the README review before pushing.
 

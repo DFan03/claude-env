@@ -1,5 +1,6 @@
 ---
 name: living-report
+disable-model-invocation: true
 description: Keep each project's GitHub README.md as a living scientific report (status -> final paper-style report). Use after every orchestrate wave, milestone, or new result, and before telling the user results.
 ---
 # Living report (README.md = the project's report)

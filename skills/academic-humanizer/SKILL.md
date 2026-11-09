@@ -1,5 +1,6 @@
 ---
 name: academic-humanizer
+disable-model-invocation: true
 version: 0.3.3
 description: |
   Improve the clarity and voice of AI-assisted academic writing (papers, theses, rebuttals) and

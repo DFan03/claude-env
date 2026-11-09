@@ -18,6 +18,10 @@ from pathlib import Path
 
 WARN, CRIT = 120_000, 180_000  # tokens; degradation starts well below window limits
 STATE_NAME = Path(".claude") / "STATE.md"
+GLOBAL_MEM = Path.home() / ".claude" / "memory" / "MEMORY.md"
+CONSOLIDATE = ("Also consolidate memory by judgment, not by age: long-term (~/.claude/memory or project memory) "
+               "= would change my behavior in a future unrelated session; STATE.md = needed to continue this work; "
+               "drop what is done, superseded, contradicted, or derivable from the repo.")
 MARK_DIR = Path.home() / ".claude" / "state" / "context_guard"
 
 
@@ -81,12 +85,12 @@ def main() -> None:
             emit("UserPromptSubmit", context=(
                 f"[context-guard] Context is ~{k}K tokens (warn {WARN//1000}K). Before continuing: "
                 f"update {state} (goal, decisions+why, current step, open questions, key file paths); "
-                "offload further reading/coding to subagents/API workers; keep only conclusions here."))
+                "offload further reading/coding to subagents/API workers; keep only conclusions here. " + CONSOLIDATE))
         else:
             emit("UserPromptSubmit",
                  context=(f"[context-guard] Context is ~{k}K tokens (critical {CRIT//1000}K). "
                           f"Update {state} NOW, commit it, then tell the user in one line to run /compact "
-                          "(STATE.md is re-injected automatically after compaction)."),
+                          "(STATE.md is re-injected automatically after compaction). " + CONSOLIDATE),
                  user_msg=f"Context ~{k}K tokens: Claude will checkpoint STATE.md; then run /compact.")
 
     elif mode == "pre":
@@ -101,11 +105,15 @@ def main() -> None:
             m.unlink()  # context resets after compaction
 
     elif mode == "start":
+        parts = []
+        if GLOBAL_MEM.exists():
+            parts.append("[memory] Global long-term memory index (files in ~/.claude/memory/; read one when relevant):\n"
+                         + GLOBAL_MEM.read_text()[:4000])
         if state.exists():
-            text = state.read_text()[:12000]
-            emit("SessionStart", context=(
-                f"[context-guard] Project state from {state} (source of truth; trust it over any summary):\n"
-                f"{text}\n[end STATE.md] Follow ~/.claude/CLAUDE.md rules; results go to README.md."))
+            parts.append(f"[context-guard] Project state from {state} (source of truth; trust it over any summary):\n"
+                         f"{state.read_text()[:12000]}\n[end STATE.md] Follow ~/.claude/CLAUDE.md rules; results go to README.md.")
+        if parts:
+            emit("SessionStart", context="\n\n".join(parts))
 
 
 if __name__ == "__main__":

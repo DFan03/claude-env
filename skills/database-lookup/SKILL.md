@@ -1,5 +1,6 @@
 ---
 name: database-lookup
+disable-model-invocation: true
 description: Queries documented public database APIs with explicit endpoints, filters, pagination, and provenance. Used when a scientific, regulatory, financial, or other database-backed fact must be retrieved reproducibly from a named source rather than inferred from general knowledge.
 license: MIT
 metadata:
