@@ -35,3 +35,8 @@ The user reads results on GitHub first. README.md is the report; chat only point
 
 ## Resource use
 At milestones and in the final report, run the `token-report` skill and embed `figures/token_usage.png` in a "Resource use" section.
+
+## README order (moved from CLAUDE.md)
+- README is for a biologist who did not do the work: lead with answers. Order: (1) task in one sentence, (2) what was built, (3) main findings with numbers, (4) what it means biologically and what it does NOT mean, (5) how far to trust it, (6) data/methods/gates/figures.
+- First screen: table "task question -> one-line answer -> section"; every numbered TASK.md question answered, or stated as unanswered.
+- Every method name gets a plain-language gloss; every figure a one-line take-home; no result without interpretation.

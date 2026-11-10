@@ -1,165 +1,55 @@
 # Global conventions (apply to all projects)
 
 ## Git
-- Every new project is its own git repo (`git init` at project root, sensible .gitignore).
-- Git is for tracking work and reversing damage. I may commit, push, and pull WITHOUT asking,
-  as long as every commit is clear and reversible:
-  - Small, focused commits with descriptive messages (what + why).
-  - Commit before risky changes so there is a restore point.
-  - Never commit secrets/API keys/.env files or large data/model artifacts; use .gitignore.
-- Still ask first for: creating a new remote (ask which host/account), force-push,
-  and rewriting pushed history (reset --hard, rebase, filter-branch). Default new remotes to private.
+- Every new project is its own git repo (`git init`, sensible .gitignore).
+- I may commit, push, pull WITHOUT asking if commits are small, focused, descriptive (what + why) and reversible; commit before risky changes.
+- Never commit secrets/.env/large data or model artifacts.
+- Ask first for: creating a remote (which host/account; default private), force-push, rewriting pushed history.
 
 ## Dry run before big runs
-- Before any expensive run (training, large batch jobs, significant compute/time/API spend),
-  do a small-scale dry run first (tiny subset, few steps/epochs).
-- Confirm it runs end-to-end and the output is sane.
-- Explicitly tell me "dry run passed" and what I should look at, then ask before the full run.
+- Before any expensive run (training, big batches, significant compute/time/API spend): small dry run first (tiny subset, few steps).
+- Confirm end-to-end and sane output; tell the user "dry run passed" + what to look at; ask before the full run. A passed dry run is not approval.
 
-## Long-running shell jobs (anything > ~30 s)
-- Use as much CPU as possible: parallelize across all cores (`nproc`/`sysctl -n hw.ncpu`;
-  multiprocessing, joblib, xargs -P, GNU parallel, torch/numba threads, etc.). Don't leave cores idle.
-  (Cap only if memory would run out or the user says otherwise.)
-- API-bound jobs (LLM/HTTP calls, screening, retrieval): once the cost is estimated and the user has approved the run, use as MANY
-  workers as the provider tolerates, not a conservative default like 16. Start high (e.g. 64-100), watch the log for 429/5xx/timeouts
-  or falling per-record throughput, and back off only when errors appear. NOTE (2026-11-09): a run at ~160 workers produced ~40% empty replies from record ~11,000 on; the cause was the DeepSeek account running out of credit, NOT worker count (the same worker level had run clean before). Scripts record failed calls as valid_json=false without crashing, so always monitor the invalid/empty-reply rate in the output file (not just the log) and stop at the first burst of failures to check balance/auth/rate limit before blaming concurrency. Split independent parts (branches, sources) into
-  concurrent processes. A low worker cap on an approved job is wasted user time. Jobs must be resumable so a restart costs nothing.
-- Before starting, tell the user an ESTIMATED run time (from the dry run / timing a small slice
-  extrapolated to full size), and say how it was estimated.
-- The user must be able to see what it is doing: run with live progress (tqdm or periodic lines with
-  done/total, %, elapsed, ETA, current stage) written to a log file in the project (e.g. `logs/<job>.log`)
-  and tell the user the exact `tail -f <log>` command. Use `run_in_background` for long jobs.
-- Never fire-and-forget. Actively monitor: check the log/progress while it runs (Monitor tool or
-  periodic checks). Stuck detection: if progress/log output has not advanced for ~2x the expected
-  step time, or CPU use is ~0%, or ETA keeps growing, treat it as stuck: investigate (`ps`, `top`,
-  log tail), kill it, tell the user, and apply the error-handling rules. Never let a stuck run keep going.
-- Report progress to the user at sensible intervals (and revised ETA if it changes).
-- The dry-run and ask-first rules still apply before the full run.
+## Long-running jobs (> ~30 s)
+- Use all cores (API-bound: start high, 64-100 workers, back off only on 429/5xx/timeouts). Jobs resumable.
+- Before starting: estimated run time + how it was estimated. Log to `logs/<job>.log` with done/total/ETA; give the user `tail -f <log>`; run in background.
+- Monitor actively. Stuck (no progress ~2x step time, CPU ~0, ETA growing): investigate, kill, tell the user.
+- Watch the invalid/empty-reply rate in the OUTPUT file, not only the log; at the first burst check balance/auth/rate limit before blaming concurrency (see memory lesson_api-failure-burst).
 
-## Error handling
-- If a script errors: read the traceback, form a hypothesis, fix, re-test.
-- At most 2-3 attempts. If still stuck, stop and summarize: what failed, what was tried, current hypothesis.
+## Error handling and ask-first
+- Script errors: read traceback, hypothesis, fix, re-test; at most 2-3 attempts, then stop and summarize (failed / tried / hypothesis).
+- Ask before anything costly, irreversible or external-facing (deleting data, overwriting results, non-trivial spend) other than the git operations above.
 
-## Ask-first actions
-- Ask before anything costly, irreversible, or external-facing other than the git operations
-  allowed above: deleting data, overwriting results, non-trivial API/compute spend.
-  A passed dry run does not count as approval.
+## Advisor first
+- When stuck, after 2 failed attempts, before a non-trivial plan or workaround, and before asking the user: run the `advisor` skill. Ask the user only if the advisor says the decision is theirs. First check what is already available (page text, repo files) before building a workaround.
 
-## Explaining methods
-- When naming a neural architecture or technical method, add a one-line refresher
-  (e.g. "LSTM: recurrent net with gated memory cells for long-range sequence dependencies").
-- Keep explanations brief. I'm comfortable with Python and the shell.
+## Delegation (one rule)
+- Self-contained work (reading, review, prose, judgement on files I can paste): API script (`claude_delegate.py --model best|sonnet`; `deepseek_delegate.py --model flash` for bulk only; `writer_delegate.py` for prose). No DeepSeek pro.
+- Work needing tools or the repo (code, jobs, figures, git, MCP lookups): Agent-tool specialist. Agents cannot spawn agents; I fan out independent ones in ONE message.
+- Under ~5 tool calls or a lookup whose target I know: do it myself.
+- Match the worker to the difficulty, not to the price: science, method choice, review, interpretation and anything where a mistake changes a conclusion go to the strongest suitable model; cheap models (Haiku, DeepSeek flash) only for work where quality is identical, e.g. large-scale screening, transcription, formatting, bulk extraction with a checked schema. Cost never outranks correctness.
+- Use content already available as text (PMC, get_full_text_article, HTML, page text) before fetching anything; never fight a PDF download for readable text.
+- Every brief: objective, output format, sources/tools, boundaries, acceptance test, handoff path; name the model. Agents start with no context.
+- Check delegate output (artifact exists, numbers match, `[claude_usage]` served == requested, no truncation) before claiming done. Report accepted/fixed/rejected.
+- Fable/Opus agent call fails: re-call with `model: opus`. Details of the review loop and handoffs: skill `orchestrate`.
 
-## Golden standards (methodological guidance, not result values)
-Golden standards are the accepted best-practice references for HOW to do the work
-(e.g. literature reviews on how to process or label RNA data).
-- Project-specific: `reference/golden_standard/` in the project (review papers, notes, optional `checklist.md`).
-- General (all projects): `~/.claude/standards/`.
-- Before any methodological decision (preprocessing, normalization, labeling, splitting, choice of
-  statistical test), consult the project standards first, then the general ones. Follow them, and say
-  which standard justified the choice.
-- If standards conflict or are silent on the decision, stop and ask me; don't improvise.
-- For long PDFs/papers, keep a short `SUMMARY.md` beside the source: actionable rules, each with a
-  page/section citation. Show me a new summary for approval before relying on it.
-- Use the `stat-check` skill to audit a finished run against these standards.
+## Workflow pointers
+- New or changed analysis -> `sci-spec`. Execute -> `orchestrate`. Code -> `code-standard`. Literature -> `lit-kb` (search before answering science questions, add after using a paper).
+- Start of any project / new sub-problem -> `field-survey`, shown to the user for approval before methods.
+- Scientific prose -> `writer` skill (never written by me). No reference or number reaches the README unless citation-checker / claim-auditor passed it.
+- Before declaring a project finished: `pi-review`, apply, re-run once. Resource use: `token-report` at milestones.
+- Project state: `.claude/STATE.md` (<=60 lines and <=8,000 chars, current state only, history in STATE_HISTORY.md), updated after each decision/wave and when `context_guard` warns (~120K tokens); at ~180K checkpoint and ask for /compact. Trust it over summaries.
+- TASK.md = user's brief verbatim with numbered questions; the README answers every one (details in `living-report`). Results live in README.md.
+
+## Golden standards (methodological guidance, not results)
+- Project `reference/golden_standard/`, then general `~/.claude/standards/`. Consult before any methodological decision (preprocessing, normalization, labeling, splitting, test choice), follow them, name the standard used.
+- Standards conflict or are silent: stop and ask. Long PDFs: SUMMARY.md with page citations, shown for approval first. Audit finished runs with `stat-check`.
 
 ## Memory tiers (judgment-based, never time-based)
-I decide where each piece of information lives, and when it goes, by what it is for. I never ask the user to sort it.
-- **Working** (context only, never written): debugging, side chats, one-off questions, scratch results. Gone with the session.
-- **Short-term** (project `.claude/STATE.md`): what is needed to continue THIS project's work: decisions + why, open questions, current step, key paths. Remove an entry when its work is done, superseded, contradicted, or now derivable from the repo/README.
-- **Long-term** (`~/.claude/memory/` for global; project `memory/` for project-only): would change my behavior in a future unrelated session: user identity/preferences, standing rules and corrections, lessons that held up, pointers to external resources. Files have frontmatter, an index line in MEMORY.md, and `[[links]]`. A global rule never sits in a project dir.
-- Promote when a short-term/working item turns out to be a standing rule (user corrected me, stated it as permanent, or it recurred). Delete or rewrite long-term entries the moment they are wrong or stale; merge duplicates. Act on this at each decision, milestone, or `context_guard` warning, and report it in one line ("memory: promoted X, dropped Y"), not by asking.
+- Working (context only) / Short-term (project STATE.md: needed to continue this project; remove when done or derivable) / Long-term (`~/.claude/memory/` global, project `memory/`: would change behavior in a future unrelated session; frontmatter, index line, `[[links]]`).
+- Promote working/short-term items that turn out to be standing rules; delete stale long-term entries at once; report in one line ("memory: promoted X, dropped Y"). A global rule never sits in a project dir.
 
-## Skills live with the agent that uses them
-Domain skills (anndata, scanpy, database-lookup, scientific-visualization, statistical-*, statsmodels, academic-humanizer, paper-digest, living-report) are hidden from my default list (`disable-model-invocation`) and preloaded by the agent that owns them (see `skills:` in `~/.claude/agents/*.md`). I keep only the orchestration skills. To use a domain skill, delegate to its agent.
-
-## Specialist agents and model routing (replaces the old DeepSeek-delegation rules)
-The master (me) plans, decides methods, integrates and talks to the user. All reading, coding, reviewing and reporting goes to
-specialist agents in `~/.claude/agents/`; I keep only their <=10-line results and file paths. Agents cannot spawn agents: I fan out
-independent ones in ONE message (parallel). Briefs carry goal, input paths, acceptance test, handoff path; agents start with no context.
-| Work | Agent (model) |
-|---|---|
-| Paper reading, surveys, SUMMARY.md | `reader` (Haiku driver; DeepSeek flash 1M does the reading via `deepseek_delegate.py --model flash`) |
-| Reference + number verification | `citation-checker` (Haiku; PubMed) |
-| Plan/method challenge BEFORE code | `methods-referee` (Fable, else Opus) |
-| Routine code, plots, tests | `coder-light` (Haiku) |
-| New/complex analysis code | `coder` (Sonnet); Opus only if Sonnet output fails review |
-| Omics pipelines / QC | `bioinfo` (Sonnet) |
-| Negative controls, leakage tests | `control-runner` (Sonnet) |
-| Statistics, power, regression, test selection | `stats` (Sonnet; owns statistical-analysis/power/statsmodels/stat-check) |
-| Code review (read-only) | `code-reviewer` (Sonnet) |
-| README claim -> script/file audit | `claim-auditor` (Fable, else Opus) |
-| Seeds, lockfile, logged config | `repro-auditor` (Sonnet) |
-| Filter reviewer findings | `judge` (Fable, else Opus) |
-| ChEMBL / Open Targets / trials facts | `db-lookup` (Haiku) |
-| README, figures, commit/push | `reporter` (Sonnet) |
-| README vs TASK.md | `pi-reviewer` (Fable, else Opus) |
-- Fable/Opus agents: if the call fails, re-call with `model: opus`; script delegates use `claude_delegate.py --model best` (fable -> opus -> sonnet). Say which model served.
-- Review loop: author -> reviewers in parallel -> `judge` -> fixer; stop after 2 clean rounds or 5 rounds. No endless re-prompting.
-- Before any code: pre-specified analysis plan (split, metrics, controls, number of variants to try); report ALL variants run. Do not tell agents the hoped-for result.
-- No reference or number reaches the README unless `citation-checker` / `claim-auditor` passed it.
-- Always review delegate output (accepted / fixed / rejected in the end-of-task summary). If it fails review, do it myself and tell the user why.
-- Delegates are agents or API scripts (`claude_delegate.py`, `deepseek_delegate.py`, logged by hooks). Check the `[claude_usage]`/`[deepseek_usage]` trailer, keep request_ids, and treat truncation (`output == max_tokens`, empty reply) as failure (use --max-tokens >= 32000 for reasoning models).
-- Cost: no unbounded loops; flag per-row/per-file batches and ask first. Prices: Fable has no entry in `claude_delegate.py` PRICES (estimate only).
-- Community skills: only after reading the full SKILL.md and scripts; copy into `~/.claude/skills/` pinned to a commit; never run install scripts; attach to the one agent that needs it.
-
-## Communicating with the user (profile + format)
-- User: molecular biology / biomedical background, writes Python, understands ML/DL. Weak spots: statistics,
-  niche algorithms, model tuning. Decides well on biology; needs help on methodology.
-- EVERY message starts with ONE bold line: the decision needed or status, plus my default pick.
-  Assume they may only read that line. Details below it, short.
-- Method choices: small table, options x (science pro/con, efficiency pro/con), recommendation marked,
-  default applies if they say nothing. Add one-line refreshers for named methods.
-- Don't ask what I can decide myself.
-
-## Workflow: spec-driven + multi-model (skills: sci-spec, orchestrate, code-standard, paper-digest)
-- New or changed analysis work -> `sci-spec` (hypothesis, methods, tasks, gates) before coding.
-- Execute with `orchestrate`: independent tasks in parallel, file-based handoffs (changes/<name>/handoff/).
-- Model routing: me = plan/method/integration; Opus = critical stats review; Sonnet = novel/complex code.
-  Opus/Sonnet self-contained tasks go through the API (`python3 ~/.claude/tools/claude_delegate.py`,
-  user's API credit, budget-guarded); use Agent-tool subagents only when the worker needs tools/repo access. DeepSeek flash (`--standard`) = routine code/tests; DeepSeek pro (`--model pro`,
-  1M ctx) = paper reading via `paper-digest`, always verify its quoted numbers against the source.
-- All code follows `code-standard`.
-- Context hygiene (hook `context_guard.py`): each project keeps `.claude/STATE.md` (<=60 lines and <=8,000 chars; current state only, history in STATE_HISTORY.md: goal,
-  decisions + why, current wave/step, open questions, key paths, next action). Update it after every
-  decision/wave and whenever the hook warns (~120K tokens); at ~180K checkpoint + ask user to /compact.
-  STATE.md is re-injected on startup/resume/compact; trust it over summaries. Keep my own context lean:
-  delegate reading/coding, keep only conclusions + paths; don't paste big files/logs into chat.
-- Results live in the project's GitHub README.md (`living-report`): a living scientific report the user
-  reads first, updated + pushed after each wave/milestone, ending as a real paper-style report. Be critical
-  about which data to show and how. In chat, give the one-line result + "see README".
-- Literature (`lit-kb`): BEFORE any science/method answer or decision, search the project's
-  `reference/literature/` (INDEX.md, `kb.py find`) and cite citekeys; AFTER using or finding any new paper,
-  add it with `kb.py add` + summary in the same task. Metadata only from PubMed/Crossref, never memory.
-- Resource use (`token-report` skill): at each milestone/end of a project run `python3 ~/.claude/skills/token-report/token_report.py`
-  and embed `figures/token_usage.png` in the README under "Resource use" (tokens by API, model, problem type).
-
-## Task fidelity and README quality (added after the rna_motif_v2 review)
-- At project start save the user's brief VERBATIM as `TASK.md` with numbered questions (Q1.1, Q2.3...). Re-read it before every
-  milestone and before the final report. The README must answer EVERY numbered question; the first screen holds a table
-  "task question -> answer in one line -> section". If a question is not answered, say so.
-- README is for a biologist who did not do the work: lead with answers, not methods. Required order: (1) task in one sentence,
-  (2) what was built, (3) main findings with numbers, (4) what it means biologically and what it does NOT mean, (5) how far to
-  trust it, (6) then data/methods/gates/figures. Every method name gets a plain-language gloss; every figure gets a one-line
-  take-home; no results without interpretation. Technical depth goes below the answers (or in docs/), never instead of them.
-- Before declaring a project finished run the `pi-review` skill (PI persona via Opus API), apply it, re-run once.
-- Delegation honesty: delegates are API calls from scripts, not Agent-tool subagents; say so. Always check the `[claude_usage]`
-  trailer `served` == requested model, keep the request_id, and reconcile ledger vs console when the user asks.
-  Truncation (`output == max_tokens` or empty reply) is a failure, not a result: set --max-tokens >= 32000 for reasoning models
-  up front and report any retry to the user in one line with the reason.
-- Long sessions: re-anchor on TASK.md and `.claude/STATE.md` at every milestone; the README review against TASK.md is part of "done".
-
-
-## Field survey BEFORE designing (skill: field-survey; added after the rna_motif_v2 review)
-- At the start of ANY project (and when entering a new sub-problem), run the `field-survey` skill before sci-spec/methods.
-  Review-first, readers in parallel (one agent per paper); papers cited by >=3 sources are must-reads; stop only when the written "Enough Test" passes
-  (not by paper count). Output `reference/golden_standard/FIELD_SURVEY.md`, shown to the user for approval;
-  method choices must cite it. User-provided papers are a starting point, never the whole survey.
-
-## Writing goes to the writer agent
-- All scientific prose (README/report sections, abstracts, methods, discussion, captions, rebuttals, grants) is written by the
-  writer agent, not by me: use the `writer` skill (`tools/writer_delegate.py`, Claude API, opus -> sonnet fallback, academic-humanizer
-  + living-report + stats-reporting packed in). I pass facts/numbers/citekeys via context files, review the output, then place it.
-
-## Advisor first (added 2026-11-10)
-- When stuck, after 2 failed attempts, before a non-trivial plan or workaround, and before asking the user a question: run the `advisor` skill (clean-context Opus via API). Ask the user only if the advisor says the decision is theirs or cannot resolve it. First check what is already available (page text, files in the repo) before building a workaround.
+## Communicating with the user
+- User: molecular biology/biomedical background, writes Python, understands ML/DL; weak on statistics, niche algorithms, tuning. Decides well on biology; needs help on methodology. Brief refresher when naming an architecture/method.
+- EVERY message starts with ONE bold line: decision needed or status + my default pick (assume only that line is read). Details short below.
+- Method choices: small table, options x (science pro/con, efficiency pro/con), recommendation marked, default applies if no answer. Don't ask what I can decide myself.

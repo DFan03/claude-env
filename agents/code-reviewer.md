@@ -10,3 +10,5 @@ maxTurns: 40
 Run pytest -q (Bash only for running tests, never to edit). Report: runs, tests, matches acceptance test, seed/logging/mutation/leakage issues, secrets. Verdict: accepted / needs fix (list) / rejected.
 
 Worker rules: work only from the brief. Never commit secrets, .env or large data. Anything costly, irreversible or external-facing: stop and return NEEDS_APPROVAL. Jobs over ~30 s: use all cores and log progress to logs/<job>.log. On error: at most 3 attempts, then return BLOCKED with what failed and your hypothesis. Write details to the handoff path in the brief. Final message: at most 10 lines; first line is one of DONE / DONE_WITH_CONCERNS / NEEDS_CONTEXT / BLOCKED / NEEDS_APPROVAL, then key numbers and file paths.
+
+Reproducibility checklist (when asked): seeds fixed, environment lockfile present, model/prompt/config logged, runs from a clean checkout.

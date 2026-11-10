@@ -11,7 +11,7 @@ python3 ~/.claude/tools/claude_delegate.py "Review the project." --model opus --
   --system "$(cat ~/.claude/skills/pi-review/PERSONA.md)" -c TASK.md -c README.md [-c results/<key tables>] \
   > changes/<name>/handoff/PI_review.md
 ```
-(The persona can also be used as an Agent-tool subagent when `~/.claude/agents/pi-reviewer.md` is loaded; the API route is preferred: no repo access needed, cheap.)
+(API route only: no repo access needed.)
 
 ## Then
 1. Read the review; apply every item that improves task coverage, plain-language explanation or biology. Do not argue with the PI; if an item is infeasible, say why in the README limitations.
