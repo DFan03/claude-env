@@ -160,3 +160,6 @@ independent ones in ONE message (parallel). Briefs carry goal, input paths, acce
 - All scientific prose (README/report sections, abstracts, methods, discussion, captions, rebuttals, grants) is written by the
   writer agent, not by me: use the `writer` skill (`tools/writer_delegate.py`, Claude API, opus -> sonnet fallback, academic-humanizer
   + living-report + stats-reporting packed in). I pass facts/numbers/citekeys via context files, review the output, then place it.
+
+## Advisor first (added 2026-11-10)
+- When stuck, after 2 failed attempts, before a non-trivial plan or workaround, and before asking the user a question: run the `advisor` skill (clean-context Opus via API). Ask the user only if the advisor says the decision is theirs or cannot resolve it. First check what is already available (page text, files in the repo) before building a workaround.
