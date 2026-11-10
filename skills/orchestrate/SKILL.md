@@ -17,3 +17,12 @@ Procedure:
 6. CLAUDE.md rules still apply: dry run before big runs, ask before cost, CPU-parallel, logs + tail -f.
 7. After each wave: `reporter` updates README.md via `living-report`; `citation-checker`/`claim-auditor` must pass before push.
 8. Tell the user one line per wave: "Wave N: k/k tasks passed; README updated; next: ...".
+
+## Orchestration rules (added 2026-11-10; patterns adapted from obra/superpowers @22f0b46, own wording)
+- **Brief template** (agents start with no context): Goal / Inputs (paths) / Acceptance test / Handoff path / Constraints (budget, files not to touch) / Return format.
+- **Status protocol**: every agent's first reply line is DONE, DONE_WITH_CONCERNS, NEEDS_CONTEXT, BLOCKED or NEEDS_APPROVAL. Master acts: DONE -> verify; CONCERNS -> read them before use; NEEDS_CONTEXT -> re-brief once; BLOCKED -> change approach or do it myself; NEEDS_APPROVAL -> ask the user.
+- **Progress ledger** `changes/<name>/LEDGER.md`: one line per task (id, agent, model, status, handoff path, verified y/n). Update after each wave; it replaces re-reading handoffs.
+- **Verification gate**: no task counts as done until its acceptance test was run or its output file opened by me or a reviewer agent; an agent's "done" is a claim, not evidence.
+- **Scale effort to task**: a one-file fix is not a wave; use one agent for <=2 small tasks, a wave only for 3+ independent tasks.
+- **When not to parallelise**: tasks that write the same files, depend on each other's numbers, or need one shared judgement call.
+- **Cheapest route first**: script/grep/existing file, then Haiku agent, then Sonnet, then Opus/Fable only for method and review judgement.

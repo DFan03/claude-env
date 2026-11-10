@@ -1,20 +1,21 @@
-# STATE (master-agent working memory; keep <= 60 lines)
-Updated: YYYY-MM-DD HH:MM
+# STATE (current state only; <=60 lines AND <=8000 chars; history goes to .claude/STATE_HISTORY.md)
+Updated: YYYY-MM-DD
 
-## Goal
-<one line>
+## NOW
+- Phase / current step:
+- Next action:
 
-## Decisions (what + why + source)
+## Open questions for the user
 - 
 
-## Current step
-change: changes/<name> | wave: N | tasks running/done:
+## Decisions in force (what + why)
+- 
 
-## Open questions for user
+## Routing in this project
 - 
 
 ## Key paths
-- spec: changes/<name>/  | handoffs: changes/<name>/handoff/ | report: README.md | lit: reference/literature/INDEX.md
+- spec: changes/<name>/ | handoffs: changes/<name>/handoff/ | report: README.md | lit: reference/literature/INDEX.md
 
-## Next action
+## Goal
 <one line>

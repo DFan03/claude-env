@@ -110,8 +110,11 @@ def main() -> None:
             parts.append("[memory] Global long-term memory index (files in ~/.claude/memory/; read one when relevant):\n"
                          + GLOBAL_MEM.read_text()[:4000])
         if state.exists():
+            txt = state.read_text()
+            if len(txt) > 12000:
+                txt = (txt[:8000] + "\n[context-guard] STATE.md is %d chars; middle omitted. Trim it to <=60 lines / 8000 chars NOW.\n" % len(txt) + txt[-3500:])
             parts.append(f"[context-guard] Project state from {state} (source of truth; trust it over any summary):\n"
-                         f"{state.read_text()[:12000]}\n[end STATE.md] Follow ~/.claude/CLAUDE.md rules; results go to README.md.")
+                         f"{txt}\n[end STATE.md] Follow ~/.claude/CLAUDE.md rules; results go to README.md.")
         if parts:
             emit("SessionStart", context="\n\n".join(parts))
 
