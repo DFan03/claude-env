@@ -1,0 +1,9 @@
+- [Close Chrome tabs when done](feedback_close-chrome-tabs.md) — close each tab right after use; batch cleanup fails
+- [Quality over cost](feedback_budget-quality-over-cost.md) — no budget ceiling, user tops up; no blind spend
+- [Model routing](feedback_model-routing.md) — Claude API for self-contained work; no DeepSeek pro; flash for bulk only
+- [claude-env repo](reference_claude-env-repo.md) — ~/.claude backed up to private GitHub; restore, API credit, /rc
+- [Advisor first](feedback_advisor-first.md) — clean-context Opus advisor before asking the user; user is fallback
+- [Science first routing](feedback_science-first-routing.md) — strongest model for science; cheap only where quality identical
+- [API failure burst](lesson_api-failure-burst.md) — empty replies: check credit/auth before blaming workers
+- [No human marking](feedback_no-human-marking.md) — replace user mark-up sheets with independent strong-model audit agent
+- [ccbox server](reference_ccbox-server.md) — Claude on AWS, one isolated agent per Mac, mac/mac-job/mac-chrome reverse control

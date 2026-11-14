@@ -12,6 +12,7 @@
 !/hooks/
 /hooks/state/
 !/standards/
+!/memory/
 !/templates/
 !/plugins/
 /plugins/*
