@@ -120,9 +120,20 @@
     "type": "command",
     "command": "bash ~/.claude/statusline.sh"
   },
+  "extraKnownMarketplaces": {
+    "local": {
+      "source": {
+        "source": "directory",
+        "path": "/home/df/.claude/local-marketplace"
+      }
+    }
+  },
   "autoCompactWindow": 200000,
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
   "switchModelsOnFlag": false,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "enabledPlugins": {
+    "bio-research@local": true
+  }
 }
