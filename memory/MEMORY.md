@@ -6,4 +6,4 @@
 - [Science first routing](feedback_science-first-routing.md) — strongest model for science; cheap only where quality identical
 - [API failure burst](lesson_api-failure-burst.md) — empty replies: check credit/auth before blaming workers
 - [No human marking](feedback_no-human-marking.md) — replace user mark-up sheets with independent strong-model audit agent
-- [ccbox server](reference_ccbox-server.md) — Claude on AWS, one isolated agent per Mac, mac/mac-job/mac-chrome reverse control
+- [ccbox server](reference_ccbox-server.md) — Claude on AWS, isolated agent per Mac (df/rf), sshfs + mac/mac-job, web on server only
