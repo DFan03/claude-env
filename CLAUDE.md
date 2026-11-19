@@ -1,10 +1,10 @@
 # Global conventions (apply to all projects)
 
 ## Git
-- Every new project is its own git repo (`git init`, sensible .gitignore).
-- I may commit, push, pull WITHOUT asking if commits are small, focused, descriptive (what + why) and reversible; commit before risky changes.
+- Every new project gets its own git repo AND a dedicated PRIVATE GitHub repo (gh, account DFan03), created without asking at project start.
+- Commit and push automatically, without asking, after each meaningful step (small, focused, descriptive what + why, reversible); commit before risky changes.
 - Never commit secrets/.env/large data or model artifacts.
-- Ask first for: creating a remote (which host/account; default private), force-push, rewriting pushed history.
+- Ask first only for: making a repo public, force-push, rewriting pushed history.
 
 ## Dry run before big runs
 - Before any expensive run (training, big batches, significant compute/time/API spend): small dry run first (tiny subset, few steps).
