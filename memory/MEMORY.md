@@ -7,3 +7,5 @@
 - [API failure burst](lesson_api-failure-burst.md) — empty replies: check credit/auth before blaming workers
 - [No human marking](feedback_no-human-marking.md) — replace user mark-up sheets with independent strong-model audit agent
 - [ccbox server](reference_ccbox-server.md) — Claude on AWS, isolated agent per Mac (df/rf), sshfs + mac/mac-job, web on server only
+- [Mac clipboard](reference_mac-clipboard.md) — user says "copy X": pipe to `mac pbcopy`; Terminal.app ignores tmux/OSC52
+- [Git on ccbox](reference_git-on-ccbox.md) — commit via `mac`, push from server (gh DFan03); server commit hangs on sshfs
